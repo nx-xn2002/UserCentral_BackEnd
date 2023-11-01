@@ -1,4 +1,4 @@
-package com.nx.nxuserbackend;
+package com.nx;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
