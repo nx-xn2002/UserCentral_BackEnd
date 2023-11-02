@@ -1,4 +1,5 @@
 package com.nx.service;
+
 import java.util.Date;
 
 import com.nx.mapper.UserMapper;
@@ -35,5 +36,13 @@ class UserServiceTest {
 
         userService.save(user);
         System.out.println(user.getId());
+    }
+
+    @Test
+    void userRegister() {
+        String userAccount = "nixiang";
+        String userPassword = "12345678";
+        String checkPassword = "12345678";
+        System.out.println(userService.userRegister(userAccount, userPassword, checkPassword));
     }
 }

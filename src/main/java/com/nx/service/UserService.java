@@ -2,12 +2,33 @@ package com.nx.service;
 
 import com.nx.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
-* @author 18702
-* @description 针对表【user】的数据库操作Service
-* @createDate 2023-10-28 21:25:11
-*/
+ * 用户服务
+ *
+ * @author 18702
+ * @description 针对表【user】的数据库操作Service
+ * @createDate 2023-10-28 21:25:11
+ */
 public interface UserService extends IService<User> {
+    /**
+     * 用户注册
+     *
+     * @param userAccount   用户账户
+     * @param userPassword  用户密码
+     * @param checkPassword 校验密码
+     * @return long 用户id
+     */
+    long userRegister(String userAccount, String userPassword, String checkPassword);
 
+    /**
+     * 用户登录
+     *
+     * @param userAccount  用户账户
+     * @param userPassword 用户密码
+     * @return {@link User } 用户信息（脱敏）
+     * @author nx
+     */
+    User userLogin(String userAccount, String userPassword, HttpServletRequest request);
 }
