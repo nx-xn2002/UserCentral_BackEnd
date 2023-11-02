@@ -1,5 +1,6 @@
 package com.nx.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.nx.model.domain.User;
 import com.nx.model.domain.request.UserLoginRequest;
 import com.nx.model.domain.request.UserRegisterRequest;
@@ -7,10 +8,14 @@ import com.nx.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.nx.content.UserContent.ADMIN_ROLE;
+import static com.nx.content.UserContent.USER_LOGIN_STATE;
 
 /**
  * @author nx
@@ -46,5 +51,44 @@ public class UserController {
             return null;
         }
         return userService.userLogin(userAccount, userPassword, request);
+    }
+
+    @GetMapping("/search")
+    public List<User> searchUsers(String username, HttpServletRequest request) {
+        //鉴权，仅管理员可查询
+        if (!isAdmin(request)) {
+            return new ArrayList<>();
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(username)) {
+            queryWrapper.like("username", username);
+        }
+        List<User> userList = userService.list(queryWrapper);
+        return userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
+    }
+
+    @PostMapping("/delete")
+    public boolean searchUsers(@RequestBody Long id, HttpServletRequest request) {
+        //鉴权，仅管理员可删除
+        if (!isAdmin(request)) {
+            return false;
+        }
+        if (id <= 0) {
+            return false;
+        }
+        //尝试逻辑删除
+        return userService.removeById(id);
+    }
+
+    /**
+     * 是否为管理员
+     *
+     * @param request
+     * @return boolean
+     * @author nx
+     */
+    private boolean isAdmin(HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        return user != null && user.getUserRole() == ADMIN_ROLE;
     }
 }

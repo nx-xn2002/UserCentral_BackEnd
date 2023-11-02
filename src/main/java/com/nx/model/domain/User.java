@@ -1,20 +1,20 @@
 package com.nx.model.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-
 /**
+ * 
  * @TableName user
  */
-@TableName(value = "user")
+@TableName(value ="user")
 @Data
 public class User implements Serializable {
     /**
-     *
+     * 
      */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -58,6 +58,11 @@ public class User implements Serializable {
      * 用户状态 0 正常
      */
     private Integer userStatus;
+
+    /**
+     * 用户角色 0-普通用户 1-管理员
+     */
+    private Integer userRole;
 
     /**
      * 创建时间

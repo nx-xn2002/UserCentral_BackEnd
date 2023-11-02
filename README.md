@@ -21,6 +21,7 @@
 - phone 电话 varchar
 - email 邮箱 varchar
 - user_status 状态 0 正常 int
+- user_role 用户角色 0 普通用户 1 管理员
 - create_time 创建时间 datetime
 - update_time 更新时间 datetime
 - deleted_flag 是否删除 0 1 (逻辑删除) tinyint
@@ -70,3 +71,11 @@
 4. 前端再次请求后端的时候（相同的域名），在请求头中带上cookie去请求
 5. 后端拿取前端传来的cookie，找到对应的session
 6. 后端从session中可以取出基于该session储存的变量（用户登录信息、登录名）
+
+### 用户管理
+
+！！！必须鉴权
+
+1. 查询用户
+    1. 允许根据用户名查询
+2. 删除用户

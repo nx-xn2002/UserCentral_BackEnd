@@ -1,7 +1,5 @@
 package com.nx.service.impl;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.nx.model.domain.User;
@@ -14,10 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.nx.content.UserContent.USER_LOGIN_STATE;
 
 /**
  * 用户服务实现类
@@ -37,7 +35,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * 盐值，混淆密码
      */
     private static final String SALT = "nixiang";
-    private static final String USER_LOGIN_STATE = "user login";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -111,19 +108,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return null;
         }
         //3.脱敏
-        User safetyUser = new User();
-        safetyUser.setId(user.getId());
-        safetyUser.setUserAccount(user.getUserAccount());
-        safetyUser.setUsername(user.getUsername());
-        safetyUser.setAvatarUrl(user.getAvatarUrl());
-        safetyUser.setGender(user.getGender());
-        safetyUser.setPhone(user.getPhone());
-        safetyUser.setEmail(user.getEmail());
-        safetyUser.setUserStatus(user.getUserStatus());
-        safetyUser.setCreateTime(user.getCreateTime());
-        safetyUser.setUpdateTime(user.getUpdateTime());
+        User safetyUser = getSafetyUser(user);
         //4.记录用户登录状态
         request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
+        return safetyUser;
+    }
+
+    /**
+     * 用户脱敏
+     *
+     * @param originUser
+     * @return {@link User }
+     * @author nx
+     */
+    @Override
+    public User getSafetyUser(User originUser) {
+        User safetyUser = new User();
+        safetyUser.setId(originUser.getId());
+        safetyUser.setUserAccount(originUser.getUserAccount());
+        safetyUser.setUsername(originUser.getUsername());
+        safetyUser.setAvatarUrl(originUser.getAvatarUrl());
+        safetyUser.setGender(originUser.getGender());
+        safetyUser.setPhone(originUser.getPhone());
+        safetyUser.setEmail(originUser.getEmail());
+        safetyUser.setUserStatus(originUser.getUserStatus());
+        safetyUser.setCreateTime(originUser.getCreateTime());
+        safetyUser.setUpdateTime(originUser.getUpdateTime());
+        safetyUser.setUserRole(originUser.getUserRole());
         return safetyUser;
     }
 }
