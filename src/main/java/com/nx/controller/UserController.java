@@ -67,6 +67,18 @@ public class UserController {
         return userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
     }
 
+    @GetMapping("/current")
+    public User getCurrentUser(HttpServletRequest request) {
+        User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (currentUser == null) {
+            return null;
+        }
+        long userId = currentUser.getId();
+        //TODO:校验用户是否合法
+        User user = userService.getById(userId);
+        return userService.getSafetyUser(user);
+    }
+
     @PostMapping("/delete")
     public boolean searchUsers(@RequestBody Long id, HttpServletRequest request) {
         //鉴权，仅管理员可删除

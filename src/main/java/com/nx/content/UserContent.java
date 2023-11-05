@@ -14,7 +14,10 @@ public interface UserContent {
      * 普通用户
      */
     int DEFAULT_ROLE = 0;
-
+    /**
+     * 默认头像
+     */
+    String DEFAULT_AVATAR = "/images/default_avatar.png";
     /**
      * 管理员用户
      */
