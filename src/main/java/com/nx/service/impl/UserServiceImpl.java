@@ -2,6 +2,8 @@ package com.nx.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.nx.common.ErrorCode;
+import com.nx.exception.BusinessException;
 import com.nx.model.domain.User;
 import com.nx.service.UserService;
 import com.nx.mapper.UserMapper;
@@ -41,19 +43,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
         //1.校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            return OTHER_ERROR;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
         if (userAccount.length() < 4) {
-            return WRONG_ACCOUNT_LENGTH;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号长度小于4");
         }
         if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            return WRONG_PASSWORD_LENGTH;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码长度小于8");
         }
         //校验账户特殊字符
         String regEx = "[\\u00A0\\s\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(regEx).matcher(userAccount);
         if (matcher.find()) {
-            return WRONG_ACCOUNT_FORMAT;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号包含特殊字符");
         }
         if (!userPassword.equals(checkPassword)) {
             return WRONG_PASSWORD_LENGTH;
@@ -63,7 +65,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq("user_account", userAccount);
         long count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
-            return USER_ACCOUNT_EXIST;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号已存在");
         }
 
         //2.对密码进行加密
@@ -87,18 +89,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         //1.校验
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         if (userAccount.length() < 4) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         if (userPassword.length() < 8) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String regEx = "[\\u00A0\\s\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(regEx).matcher(userAccount);
         if (matcher.find()) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //2.加密
         String newPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
@@ -109,7 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = userMapper.selectOne(queryWrapper);
         if (user == null) {
             log.info("user[{}] login failed, userAccount cannot match userPassword", userAccount);
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名或密码错误");
         }
         //3.脱敏
         User safetyUser = getSafetyUser(user);
@@ -144,6 +146,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUpdateTime(originUser.getUpdateTime());
         safetyUser.setUserRole(originUser.getUserRole());
         return safetyUser;
+    }
+
+    /**
+     * 移除登录态
+     *
+     * @param request
+     * @author nx
+     */
+    @Override
+    public int userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return 1;
     }
 }
 
