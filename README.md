@@ -87,13 +87,14 @@
 
 ```json
 {
-  //业务状态码
-  "code": 0,
-  "data": {
-    "username": "nixiang",
-    "userAccount": "nixiang"
-  },
-  "message": "ok"
+   //业务状态码
+   "code": 0,
+   "data": {
+      "username": "nixiang",
+      "userAccount": "nixiang"
+   },
+   "message": "ok",
+   "description": ""
 }
 ```
 
