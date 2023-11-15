@@ -87,17 +87,23 @@
 
 ```json
 {
-   //业务状态码
-   "code": 0,
-   "data": {
-      "username": "nixiang",
-      "userAccount": "nixiang"
-   },
-   "message": "ok",
-   "description": ""
+  //业务状态码
+  "code": 0,
+  "data": {
+    "username": "nixiang",
+    "userAccount": "nixiang"
+  },
+  "message": "ok",
+  "description": ""
 }
 ```
 
 2. 封装全局异常处理
     1. 定义业务异常
     2. 定义全局异常处理类
+
+线上启动项目:
+
+```Bash
+java -jar .\nxuser-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+```
